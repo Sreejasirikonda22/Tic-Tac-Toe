@@ -1,0 +1,135 @@
+<!-- flask import Flask -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tic Tac Toe</title>
+    <style>
+        /* basic page styling */
+        body{
+            text-align:center;
+            font-family:serif;
+        }
+        .board{
+            display:grid;
+            grid-template-columns:repeat(3, 100px);
+            gap:5px;
+            justify-content:center;
+            margin:20px auto;
+        }
+        .cell{
+            width:100px;
+            height:100px;
+            background:greenyellow;
+            font-size:40px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            cursor:pointer;
+        }
+        .cell:hover{
+            background:pink;
+        }
+        button{
+            padding:8px 15px;
+            margin:5px;
+            font-size:14px;
+        }
+    </style>
+</head>
+<body>
+<h1>Tic Tac Toe</h1>
+<!-- mode selection buttons -->
+<div>
+    <button onclick="setMode('pvp')">Player vs Player</button>
+    <button onclick="setMode('cpu')">Player vs Computer</button>
+</div>
+<!-- game board -->
+<div class="board">
+    <!-- Each cell represents one position in the board array -->
+    <div class="cell" onclick="handleClick(0)"></div>
+    <div class="cell" onclick="handleClick(1)"></div>
+    <div class="cell" onclick="handleClick(2)"></div>
+    <div class="cell" onclick="handleClick(3)"></div>
+    <div class="cell" onclick="handleClick(4)"></div>
+    <div class="cell" onclick="handleClick(5)"></div>
+    <div class="cell" onclick="handleClick(6)"></div>
+    <div class="cell" onclick="handleClick(7)"></div>
+    <div class="cell" onclick="handleClick(8)"></div>
+</div>
+<p id="status">X's Turn</p>
+<button onclick="resetGame()">Restart Game</button>
+<script>
+    let board = ["", "", "", "", "", "", "", "", ""];
+    let currentPlayer = "X";
+    let gameOver = false;
+    // DOM elements //
+    let mode="pvp";
+    const statusText=document.getElementById("status");
+    const cells=document.getElementsByClassName("cell");
+    // all possible winning cobinations //
+    const winPatterns=[
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+    ];
+    // set game mode and restart game //
+    function setMode(m){
+        mode=m;
+        resetGame();
+    }
+    // handle click on a cell //
+    function handleClick(index) {
+        // ignore if cell already filled or game ended //
+        if (board[index] !== "" || gameOver) return;
+        // update board and UI //
+        board[index]=currentPlayer;
+        cells[index].innerText=currentPlayer;
+        // check for winner //
+        if (checkWinner()) {
+            statusText.innerText=currentPlayer + "Wins!";
+            gameOver=true;
+            return;
+        }
+        // check for draw //
+        if (!board.includes("")){
+            statusText.innerText = "It's a Draw!";
+            gameOver = true;
+            return;
+        }
+        // switch player //
+        currentPlayer=currentPlayer==="X" ? "O" : "X";
+        statusText.innerText=currentPlayer + "'s Turn";
+        if (mode === "cpu" && currentPlayer === "O") {
+            setTimeout(computerMove, 500);
+        }
+    }
+    // computer selects a random empty cell //
+    function computerMove(){
+        let empty = board
+            .map((v,i) => v === "" ? i : null)
+            .filter(v => v !== null);
+        let move = empty[Math.floor(Math.random() * empty.length)];
+        handleClick(move);
+    }
+    // check if current player has won //
+    function checkWinner(){
+        return winPatterns.some(p =>
+            p.every(i => board[i] === currentPlayer)
+        );
+    }
+    // reset the game //
+    function resetGame(){
+        board=["", "", "", "", "", "", "", "", ""];
+        currentPlayer="X";
+        gameOver=false;
+        statusText.innerText="X's Turn";
+        // clear board UI //
+        for (let c of cells) c.innerText="";
+    }
+</script>
+</body>
+</html>
+
+
+
